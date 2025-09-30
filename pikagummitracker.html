@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Picagummy Tracker</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #e6f0ff; /* azul clarito */
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #99c2ff; /* azul un poco más oscuro */
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.5em;
+    }
+    main {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #f0f8ff; /* blanco-azulado suave */
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #3366cc; /* azul para títulos */
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    select, input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #3366cc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      margin-top: 15px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:hover {
+      background: #4d85ff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #3366cc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #3366cc;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  Bienvenida, Velyntilina
+</header>
+
+<main>
+  <h2>Agregar Producción</h2>
+  <label for="sabor">Sabor:</label>
+  <select id="sabor">
+    <option value="Mango">Mango</option>
+    <option value="Sandía">Sandía</option>
+    <option value="Naranja">Naranja</option>
+    <option value="Manzana">Manzana</option>
+    <option value="Durazno">Durazno</option>
+    <option value="Gomita oso">Gomita oso</option>
+    <option value="Gomita gusano">Gomita gusano</option>
+  </select>
+
+  <label for="tamano">Tamaño:</label>
+  <select id="tamano">
+    <option value="pequeña">Pequeña</option>
+    <option value="grande">Grande</option>
+  </select>
+
+  <label for="cantidad">Cantidad de bolsas:</label>
+  <input type="number" id="cantidad" min="1" value="1">
+
+  <button onclick="agregarProduccion()">Agregar Registro</button>
+
+  <h2>Resumen Diario</h2>
+  <table id="resumen">
+    <thead>
+      <tr>
+        <th>Sabor</th>
+        <th>Pequeñas</th>
+        <th>Grandes</th>
+        <th>Ganancia Pequeñas</th>
+        <th>Ganancia Grandes</th>
+        <th>Total Sabor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Se llenará automáticamente -->
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="5">Ganancia Total del Día</th>
+        <th id="totalDia">0</th>
+      </tr>
+    </tfoot>
+  </table>
+</main>
+
+<script>
+  const precios = { pequeña: 2.5, grande: 5 };
+  const sabores = ["Mango","Sandía","Naranja","Manzana","Durazno","Gomita oso","Gomita gusano"];
+  let registros = [];
+
+  function agregarProduccion() {
+    const sabor = document.getElementById("sabor").value;
+    const tamano = document.getElementById("tamano").value;
+    const cantidad = parseInt(document.getElementById("cantidad").value);
+
+    registros.push({ sabor, tamano, cantidad });
+    actualizarResumen();
+  }
+
+  function actualizarResumen() {
+    const resumen = document.querySelector("#resumen tbody");
+    resumen.innerHTML = "";
+
+    let totalDia = 0;
+
+    sabores.forEach(sabor => {
+      let peq = registros
+        .filter(r => r.sabor === sabor && r.tamano === "pequeña")
+        .reduce((acc, r) => acc + r.cantidad, 0);
+      let grd = registros
+        .filter(r => r.sabor === sabor && r.tamano === "grande")
+        .reduce((acc, r) => acc + r.cantidad, 0);
+
+      let gananciaPeq = peq * precios.pequeña;
+      let gananciaGrd = grd * precios.grande;
+      let totalSabor = gananciaPeq + gananciaGrd;
+      totalDia += totalSabor;
+
+      resumen.innerHTML += `
+        <tr>
+          <td>${sabor}</td>
+          <td>${peq}</td>
+          <td>${grd}</td>
+          <td>${gananciaPeq.toFixed(2)}</td>
+          <td>${gananciaGrd.toFixed(2)}</td>
+          <td>${totalSabor.toFixed(2)}</td>
+        </tr>
+      `;
+    });
+
+    document.getElementById("totalDia").innerText = totalDia.toFixed(2);
+  }
+</script>
+
+</body>
+</html>
